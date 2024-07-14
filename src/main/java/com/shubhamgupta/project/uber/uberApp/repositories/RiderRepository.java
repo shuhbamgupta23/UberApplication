@@ -1,6 +1,6 @@
 package com.shubhamgupta.project.uber.uberApp.repositories;
 
-import com.codingshuttle.project.uber.uberApp.entities.Rider;
+import com.shubhamgupta.project.uber.uberApp.entities.Rider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
