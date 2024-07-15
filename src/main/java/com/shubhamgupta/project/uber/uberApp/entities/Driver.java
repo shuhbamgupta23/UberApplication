@@ -2,12 +2,11 @@ package com.shubhamgupta.project.uber.uberApp.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.locationtech.jts.geom.Point;
 
-@Entity
+
 @Data
+@Entity
 public class Driver {
 
     @Id
@@ -25,3 +24,7 @@ public class Driver {
     @Column(columnDefinition = "Geometry(Point, 4326)")
     Point currentLocation;
 }
+
+
+
+
