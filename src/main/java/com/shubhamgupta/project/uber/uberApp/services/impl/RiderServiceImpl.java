@@ -4,12 +4,19 @@ import com.shubhamgupta.project.uber.uberApp.dto.DriverDto;
 import com.shubhamgupta.project.uber.uberApp.dto.RideDto;
 import com.shubhamgupta.project.uber.uberApp.dto.RideRequestDto;
 import com.shubhamgupta.project.uber.uberApp.dto.RiderDto;
+import com.shubhamgupta.project.uber.uberApp.entities.Driver;
 import com.shubhamgupta.project.uber.uberApp.entities.RideRequest;
+import com.shubhamgupta.project.uber.uberApp.entities.Rider;
+import com.shubhamgupta.project.uber.uberApp.entities.User;
+import com.shubhamgupta.project.uber.uberApp.entities.enums.RideRequestStatus;
+import com.shubhamgupta.project.uber.uberApp.repositories.RideRequestRepository;
+import com.shubhamgupta.project.uber.uberApp.repositories.RiderRepository;
 import com.shubhamgupta.project.uber.uberApp.services.RiderService;
+import com.shubhamgupta.project.uber.uberApp.strategies.DriverMatchingStrategy;
+import com.shubhamgupta.project.uber.uberApp.strategies.impl.DriverMatchingHighestRatedDriverStrategy;
+import com.shubhamgupta.project.uber.uberApp.strategies.impl.RiderFareDefaultFareCalculationStrategy;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,14 +24,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RiderServiceImpl implements RiderService {
 
-    private static final Logger log = LoggerFactory.getLogger(RiderServiceImpl.class);
     private final ModelMapper modelMapper;
+    private final RiderFareDefaultFareCalculationStrategy riderFareDefaultFareCalculationStrategy;
+    private final DriverMatchingStrategy driverMatchingStrategy;
+    private final RideRequestRepository rideRequestRepository;
+    private final RiderRepository riderRepository;
+
 
     @Override
     public RideRequestDto requestRide(RideRequestDto rideRequestDto) {
         RideRequest rideRequest = modelMapper.map(rideRequestDto, RideRequest.class);
-        log.info(rideRequest.toString());
-        return null;
+        rideRequest.setRideRequestStatus(RideRequestStatus.PENDING);
+        double fare = riderFareDefaultFareCalculationStrategy.calculateFare(rideRequest);
+        rideRequest.setFare(fare);
+        RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
+        driverMatchingStrategy.findMatchingDriver(rideRequest);
+        return modelMapper.map(savedRideRequest, RideRequestDto.class);
     }
 
     @Override
@@ -45,5 +60,16 @@ public class RiderServiceImpl implements RiderService {
     @Override
     public List<RideDto> getAllMyRides() {
         return List.of();
+    }
+
+    @Override
+    public Rider createNewRider(User user) {
+        Rider rider = Rider.builder()
+                .user(user)
+                .rating(0.0)
+                .build();
+
+        return riderRepository.save(rider);
+
     }
 }
