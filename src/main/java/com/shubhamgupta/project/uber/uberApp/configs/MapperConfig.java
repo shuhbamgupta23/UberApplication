@@ -1,5 +1,8 @@
 package com.shubhamgupta.project.uber.uberApp.configs;
 
+import com.shubhamgupta.project.uber.uberApp.dto.PointDto;
+import com.shubhamgupta.project.uber.uberApp.utils.GeometryUtil;
+import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +12,20 @@ public class MapperConfig {
 
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        ModelMapper mapper = new ModelMapper();
+        mapper.typeMap(PointDto.class, Point.class).setConverter(Context -> {
+            PointDto pointDto = Context.getSource();
+            return GeometryUtil.createPoint(pointDto);
+        });
+        mapper.typeMap(Point.class, PointDto.class).setConverter(Context -> {
+            Point point = Context.getSource();
+            double[] coordinates = {
+                    point.getX(),
+                    point.getY()
+            };
+            return new PointDto(coordinates);
+        });
+
+        return mapper;
     }
 }
