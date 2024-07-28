@@ -13,7 +13,7 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
 
 
     @Query(value = "SELECT d.*, ST_Distance(d.current_location, :pickUpLocation) as distance "+
-            "from drivers as d "+
+            "from driver as d "+
             "where d.available = true AND ST_DWithin(d.current_location, :pickUpLocation, 10000) "+
             "Order by distance " +
             "Limit 10 ", nativeQuery = true
@@ -22,7 +22,7 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
 
 
     @Query(value = "SELECT d.* "+
-            "from drivers as d "+
+            "from driver as d "+
             "where d.available = true AND ST_DWithin(d.current_location, :pickUpLocation, 15000) "+
             "Order by rating DESC " +
             "Limit 10 ",nativeQuery = true)
