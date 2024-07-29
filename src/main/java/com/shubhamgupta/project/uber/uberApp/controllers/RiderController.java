@@ -22,4 +22,6 @@ public class RiderController {
         return ResponseEntity.ok(riderService.requestRide(rideRequestDto));
     }
 
+
+
 }
