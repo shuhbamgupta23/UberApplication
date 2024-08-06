@@ -31,10 +31,6 @@ public class RideServiceImpl implements RideService {
        return rideRepository.findById(rideId).orElseThrow(()->new ResourceNotFoundException("Ride not found with rideId: "+rideId));
     }
 
-    @Override
-    public void matchWithDriver(RideRequestDto rideRequestDto) {
-
-    }
 
     @Override
     public Ride createNewRide(RideRequest rideRequest, Driver driver) {
