@@ -1,7 +1,6 @@
 package com.shubhamgupta.project.uber.uberApp.services;
 
 
-import com.shubhamgupta.project.uber.uberApp.dto.WalletTransactionDTO;
 import com.shubhamgupta.project.uber.uberApp.entities.WalletTransaction;
 
 public interface WalletTransactionService {

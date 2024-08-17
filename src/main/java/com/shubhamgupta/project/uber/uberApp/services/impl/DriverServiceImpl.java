@@ -2,6 +2,7 @@ package com.shubhamgupta.project.uber.uberApp.services.impl;
 
 import com.shubhamgupta.project.uber.uberApp.dto.DriverDto;
 import com.shubhamgupta.project.uber.uberApp.dto.RideDto;
+import com.shubhamgupta.project.uber.uberApp.dto.RiderDto;
 import com.shubhamgupta.project.uber.uberApp.entities.Driver;
 import com.shubhamgupta.project.uber.uberApp.entities.Ride;
 import com.shubhamgupta.project.uber.uberApp.entities.RideRequest;
@@ -9,10 +10,7 @@ import com.shubhamgupta.project.uber.uberApp.entities.enums.RideRequestStatus;
 import com.shubhamgupta.project.uber.uberApp.entities.enums.RideStatus;
 import com.shubhamgupta.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.shubhamgupta.project.uber.uberApp.repositories.DriverRepository;
-import com.shubhamgupta.project.uber.uberApp.services.DriverService;
-import com.shubhamgupta.project.uber.uberApp.services.PaymentService;
-import com.shubhamgupta.project.uber.uberApp.services.RideRequestService;
-import com.shubhamgupta.project.uber.uberApp.services.RideService;
+import com.shubhamgupta.project.uber.uberApp.services.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,7 +30,7 @@ public class DriverServiceImpl implements DriverService {
     private final DriverRepository driverRepository;
     private final RideService rideService;
     private final PaymentService paymentService;
-
+    private final RatingService ratingService;
 
     @Override
     @Transactional
@@ -82,7 +80,7 @@ public class DriverServiceImpl implements DriverService {
             throw new RuntimeException("Driver cannot start a ride as has not accepted the ride earlier");
         }
         if (!ride.getRideStatus().equals(RideStatus.CONFIRMED)) {
-            throw new RuntimeException("Ride status is not confirmed,, current status: " + ride.getRideStatus());
+            throw new RuntimeException("Ride status is not confirmed, current status: " + ride.getRideStatus());
         }
         if (!ride.getOtp().equals(otp)) {
             throw new RuntimeException("Invalid OTP, OTP: " + otp);
@@ -92,6 +90,7 @@ public class DriverServiceImpl implements DriverService {
         Ride savedRide = rideService.updateRideStatus(ride, RideStatus.ONGOING);
 
         paymentService.createNewPayment(savedRide);
+        ratingService.createNewRating(savedRide);
 
         driver.setAvailable(false);
         return modelMapper.map(savedRide, RideDto.class);
@@ -120,8 +119,16 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public RideDto rateRider(Long rideId, Integer rating) {
-        return null;
+    public RiderDto rateRider(Long rideId, Integer rating) {
+        Ride ride = rideService.getRideById(rideId);
+        Driver driver = getCurrentDriver();
+        if (!driver.equals(ride.getDriver())) {
+            throw new RuntimeException("Driver cannot rate a rider as he is not the owner of this ride");
+        }
+        if (!ride.getRideStatus().equals(RideStatus.ENDED)) {
+            throw new RuntimeException("Ride status is not confirmed, current status: " + ride.getRideStatus());
+        }
+      return ratingService.rateRider(ride, rating);
     }
 
     @Override
@@ -145,6 +152,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver updateDriverAvailability(Driver driver, boolean availabilityStatus) {
         driver.setAvailable(availabilityStatus);
+        return driverRepository.save(driver);
+    }
+
+    @Override
+    public Driver createNewDriver(Driver driver) {
         return driverRepository.save(driver);
     }
 }

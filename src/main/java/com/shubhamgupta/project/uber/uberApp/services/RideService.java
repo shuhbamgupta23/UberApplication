@@ -1,6 +1,5 @@
 package com.shubhamgupta.project.uber.uberApp.services;
 
-import com.shubhamgupta.project.uber.uberApp.dto.RideRequestDto;
 import com.shubhamgupta.project.uber.uberApp.entities.Driver;
 import com.shubhamgupta.project.uber.uberApp.entities.Ride;
 import com.shubhamgupta.project.uber.uberApp.entities.RideRequest;
