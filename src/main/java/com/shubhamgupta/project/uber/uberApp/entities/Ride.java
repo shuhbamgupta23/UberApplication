@@ -4,7 +4,6 @@ package com.shubhamgupta.project.uber.uberApp.entities;
 import com.shubhamgupta.project.uber.uberApp.entities.enums.PaymentMethod;
 import com.shubhamgupta.project.uber.uberApp.entities.enums.RideStatus;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
