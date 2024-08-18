@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -76,7 +77,7 @@ public class RiderServiceImpl implements RiderService {
     @Override
     public DriverDto rateDriver(Long rideId, Integer rating) {
         Ride ride = rideService.getRideById(rideId);
-        Rider rider  = getCurrentRider();
+        Rider rider = getCurrentRider();
         if (!rider.equals(ride.getRider())) {
             throw new RuntimeException("Rider cannot rate a driver as he is not the owner of this ride");
         }
@@ -104,14 +105,14 @@ public class RiderServiceImpl implements RiderService {
                 .user(user)
                 .rating(0.0)
                 .build();
-
         return riderRepository.save(rider);
 
     }
 
     @Override
     public Rider getCurrentRider() {
-        return riderRepository.findById(1L).orElseThrow(() -> new ResourceNotFoundException("Rider not found with id " + 1));
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return riderRepository.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Rider not found with id " + user.getId()));
 
     }
 }

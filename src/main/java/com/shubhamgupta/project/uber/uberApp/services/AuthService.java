@@ -1,9 +1,9 @@
 package com.shubhamgupta.project.uber.uberApp.services;
 
 import com.shubhamgupta.project.uber.uberApp.dto.DriverDto;
-import com.shubhamgupta.project.uber.uberApp.dto.LoginResponseDto;
 import com.shubhamgupta.project.uber.uberApp.dto.SignupDto;
 import com.shubhamgupta.project.uber.uberApp.dto.UserDto;
+
 public interface AuthService {
 
     String[] login(String email, String password);
@@ -11,4 +11,7 @@ public interface AuthService {
     UserDto signup(SignupDto signupDto);
 
     DriverDto onboardNewDriver(Long userId, String vehicleId);
+
+    String refreshToken(String refreshToken);
+
 }

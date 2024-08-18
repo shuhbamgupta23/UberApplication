@@ -9,6 +9,7 @@ import com.shubhamgupta.project.uber.uberApp.entities.enums.Role;
 import com.shubhamgupta.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.shubhamgupta.project.uber.uberApp.exceptions.RunTimeConflictException;
 import com.shubhamgupta.project.uber.uberApp.repositories.UserRepository;
+import com.shubhamgupta.project.uber.uberApp.security.JWTService;
 import com.shubhamgupta.project.uber.uberApp.services.AuthService;
 import com.shubhamgupta.project.uber.uberApp.services.DriverService;
 import com.shubhamgupta.project.uber.uberApp.services.RiderService;
@@ -16,6 +17,9 @@ import com.shubhamgupta.project.uber.uberApp.services.WalletService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +35,20 @@ public class AuthServiceImpl implements AuthService {
     private final WalletService walletService;
     private final DriverService driverService;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JWTService jwtService;
 
     @Override
     public String[] login(String email, String password) {
-        String tokens[] = new String[2];
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
+        );
+        User user = (User) authentication.getPrincipal();
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
-        return tokens;
+        return new String[]{accessToken, refreshToken};
+
     }
 
     @Override
@@ -81,4 +93,13 @@ public class AuthServiceImpl implements AuthService {
 
 
     }
+
+    @Override
+    public String refreshToken(String refreshToken) {
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found with userId: "+userId));
+        return jwtService.generateAccessToken(user);
+    }
+
+
 }
