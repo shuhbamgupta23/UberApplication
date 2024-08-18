@@ -3,7 +3,7 @@ package com.shubhamgupta.project.uber.uberApp.controllers;
 
 import com.shubhamgupta.project.uber.uberApp.dto.DriverDto;
 import com.shubhamgupta.project.uber.uberApp.dto.RideDto;
-import com.shubhamgupta.project.uber.uberApp.dto.RideStartDTO;
+import com.shubhamgupta.project.uber.uberApp.dto.RideStartDto;
 import com.shubhamgupta.project.uber.uberApp.dto.RiderDto;
 import com.shubhamgupta.project.uber.uberApp.services.DriverService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class DriverController {
 
 
     @PostMapping("/startRide/{rideRequestId}")
-    public ResponseEntity<RideDto> startRide(@PathVariable Long rideRequestId, @RequestBody RideStartDTO rideStartDTO) {
+    public ResponseEntity<RideDto> startRide(@PathVariable Long rideRequestId, @RequestBody RideStartDto rideStartDTO) {
         return ResponseEntity.ok(driverService.startRide(rideRequestId, rideStartDTO.getOtp()));
     }
 

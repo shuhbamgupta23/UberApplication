@@ -4,7 +4,7 @@ package com.shubhamgupta.project.uber.uberApp.dto;
 import lombok.Data;
 
 @Data
-public class RatingDTO {
+public class RatingDto {
 
     private Long rideId;
 
